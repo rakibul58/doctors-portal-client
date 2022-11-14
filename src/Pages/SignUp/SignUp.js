@@ -1,12 +1,36 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../contexts/AuthProvider';
 
 const SignUp = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
+    const { createUser, updateUser } = useContext(AuthContext);
+    const [signUpError , setSignUpError] = useState("");
+
     const handleSignUp = data => {
         console.log(data);
+        createUser(data.email, data.password)
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+
+                toast.success('User Created Successfully.');
+                setSignUpError("");
+
+                const userInfo = {
+                    displayName: data.name
+                }
+
+                updateUser(userInfo)
+                    .then(() => { })
+                    .catch(error => console.log(error));
+
+            })
+            .catch(error => setSignUpError(error.message));
     }
+
     return (
         <div className='px-6'>
             <div className="w-full max-w-sm p-8 space-y-3 rounded-xl bg-gray-50 text-gray-800 mx-auto my-24 shadow-xl">
@@ -29,7 +53,7 @@ const SignUp = () => {
                             <label htmlFor="password" className="block text-gray-600 font-bold">Password</label>
                             <input {...register("password", {
                                 required: "Password is required",
-                                pattern: {value: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])/ , message: "Password Must be strong"},
+                                pattern: { value: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])/, message: "Password Must be strong" },
                                 minLength: { value: 6, message: "Password must be 6 words or longer" },
                             })} type="password" className="w-full px-4 py-3 rounded-md border-gray-300 bg-gray-50 text-gray-800 focus:border-red-600 border" />
                             {errors.password && <p role="alert" className='text-error'>{errors.password?.message}</p>}
@@ -39,6 +63,7 @@ const SignUp = () => {
                         </div>
 
                         <input className='btn btn-accent w-full' type="submit" value='Sign Up' />
+                        {signUpError && <p className='text-error'>{signUpError}</p> }
                         <p className='text-center'>Already have an account? <Link to='/login' className='text-secondary hover:text-opacity-80'>Login</Link></p>
                     </form>
                     <div className="divider">OR</div>
