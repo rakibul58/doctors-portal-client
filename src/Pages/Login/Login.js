@@ -5,8 +5,8 @@ import { AuthContext } from '../../contexts/AuthProvider';
 
 const Login = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
-    const {signIn} = useContext(AuthContext);
-    const [loginError , setLoginError] = useState("");
+    const { signIn, googleLogin } = useContext(AuthContext);
+    const [loginError, setLoginError] = useState("");
     let location = useLocation();
     let navigate = useNavigate();
 
@@ -14,18 +14,33 @@ const Login = () => {
 
     const handleLogin = data => {
         console.log(data);
-        signIn(data.email , data.password)
-        .then(result =>{
-            const user = result.user;
-            console.log(user);
-            console.log(from);
-            setLoginError("");
-            navigate(from , {replace: true});
-        })
-        .catch(error=>{
-            console.error(error);
-            setLoginError(error.message);
-        });
+        signIn(data.email, data.password)
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+                console.log(from);
+                setLoginError("");
+                navigate(from, { replace: true });
+            })
+            .catch(error => {
+                console.error(error);
+                setLoginError(error.message);
+            });
+    }
+
+    const handleGoogleLogin = () => {
+        googleLogin()
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+                console.log(from);
+                setLoginError("");
+                navigate(from, { replace: true });
+            })
+            .catch(error => {
+                console.error(error);
+                setLoginError(error.message);
+            });
     }
 
     return (
@@ -41,7 +56,7 @@ const Login = () => {
                         </div>
                         <div className="space-y-1 text-sm">
                             <label htmlFor="password" className="block text-gray-600 font-bold">Password</label>
-                            <input {...register("password", { required: "Password is required" , minLength: {value: 6 , message: "Password must be 6 words or longer"} })} type="password" className="w-full px-4 py-3 rounded-md border-gray-300 bg-gray-50 text-gray-800 focus:border-red-600 border" />
+                            <input {...register("password", { required: "Password is required", minLength: { value: 6, message: "Password must be 6 words or longer" } })} type="password" className="w-full px-4 py-3 rounded-md border-gray-300 bg-gray-50 text-gray-800 focus:border-red-600 border" />
                             {errors.password && <p role="alert" className='text-error'>{errors.password?.message}</p>}
                             <div className="flex justify-start text-xs text-gray-600 hover:text-opacity-80">
                                 <Link href="#">Forgot Password?</Link>
@@ -53,7 +68,7 @@ const Login = () => {
                         <p className='text-center'>New to Doctors Portal? <Link to='/signup' className='text-secondary hover:text-opacity-80'>Create new account</Link></p>
                     </form>
                     <div className="divider">OR</div>
-                    <button className="btn btn-outline btn-accent uppercase w-full my-3">Continue With Google</button>
+                    <button onClick={handleGoogleLogin} className="btn btn-outline btn-accent uppercase w-full my-3">Continue With Google</button>
                 </div>
             </div>
         </div>
