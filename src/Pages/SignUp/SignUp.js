@@ -3,12 +3,19 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthProvider';
+import useToken from '../../hooks/useToken';
 
 const SignUp = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
     const { createUser, updateUser } = useContext(AuthContext);
-    const [signUpError , setSignUpError] = useState("");
+    const [signUpError, setSignUpError] = useState("");
+    const [createdUserEmail, setCreateUserEmail] = useState('');
+    const [token] = useToken(createdUserEmail);
     const navigate = useNavigate();
+
+    if(token){
+        navigate('/');
+    }
 
     const handleSignUp = data => {
         console.log(data);
@@ -26,13 +33,31 @@ const SignUp = () => {
 
                 updateUser(userInfo)
                     .then(() => {
-                        navigate('/');
-                     })
+                        saveUser(data.name, user?.email);
+                    })
                     .catch(error => console.log(error));
 
             })
             .catch(error => setSignUpError(error.message));
     }
+
+    const saveUser = (name, email) => {
+        const user = { name, email };
+        fetch('http://localhost:5000/users', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        })
+            .then(res => res.json())
+            .then(data => {
+                setCreateUserEmail(email);
+            });
+    }
+
+
+
 
     return (
         <div className='px-6'>
@@ -66,7 +91,7 @@ const SignUp = () => {
                         </div>
 
                         <input className='btn btn-accent w-full' type="submit" value='Sign Up' />
-                        {signUpError && <p className='text-error'>{signUpError}</p> }
+                        {signUpError && <p className='text-error'>{signUpError}</p>}
                         <p className='text-center'>Already have an account? <Link to='/login' className='text-secondary hover:text-opacity-80'>Login</Link></p>
                     </form>
                     <div className="divider">OR</div>
