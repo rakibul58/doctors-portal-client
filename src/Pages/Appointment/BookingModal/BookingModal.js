@@ -3,8 +3,8 @@ import React, { useContext } from 'react';
 import toast from 'react-hot-toast';
 import { AuthContext } from '../../../contexts/AuthProvider';
 
-const BookingModal = ({ treatment, setTreatment, selectedDate , refetch}) => {
-    const { name:treatmentName, slots } = treatment;
+const BookingModal = ({ treatment, setTreatment, selectedDate, refetch }) => {
+    const { name: treatmentName, slots, price } = treatment;
     const date = format(selectedDate, 'PP');
     const { user } = useContext(AuthContext);
 
@@ -22,7 +22,8 @@ const BookingModal = ({ treatment, setTreatment, selectedDate , refetch}) => {
             patient: name,
             slot,
             email,
-            phone
+            phone,
+            price
         }
 
         fetch('http://localhost:5000/bookings', {
@@ -40,7 +41,7 @@ const BookingModal = ({ treatment, setTreatment, selectedDate , refetch}) => {
                     toast.success('Booking Confirmed');
                     refetch();
                 }
-                else{
+                else {
                     toast.error(data.message);
                 }
             });
