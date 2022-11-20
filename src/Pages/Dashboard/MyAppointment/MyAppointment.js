@@ -58,7 +58,7 @@ const MyAppointment = () => {
                                         }
                                         {
                                             booking.price && booking.paid && <button
-                                                className='btn btn-xs btn-disabled px-7 btn-success'
+                                                className='btn btn-xs px-7 btn-secondary'
                                             >Paid</button>
                                         }
                                     </td>
